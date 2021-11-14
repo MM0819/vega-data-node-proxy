@@ -52,9 +52,9 @@ const graphql_hosts = [
 ];
 
 const grpc_hosts = [
-  { url: 'https://vega-data-grpc.chorus.one:443', healthy: false },
-  { url: 'http://commodum.mainnet.vega.community:3007', healthy: false },
-  { url: 'http://lovali.mainnet.vega.community:3007', healthy: false },
+  { url: 'vega-data-grpc.chorus.one:443', healthy: false },
+  { url: 'commodum.mainnet.vega.community:3007', healthy: false },
+  { url: 'lovali.mainnet.vega.community:3007', healthy: false },
   { url: 'grpc.vega.xprv.io:443', healthy: false },
   { url: 'nala.mainnet.vega.community:3007', healthy: false },
   { url: 'b-harvest.mainnet.vega.community:3007', healthy: false },
