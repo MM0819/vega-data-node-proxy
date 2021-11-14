@@ -18,7 +18,7 @@ The service currently contains hard-coded URLs for known data nodes that are run
 
 The following services are available via the `vega.community` domain, which is an unofficial domain used to host services and tools related to the Vega network:
 
-* http://api.vega.community - REST API proxy
-* http://grpc.vega.community - gRPC proxy
-* http://graphql.vega.community - GraphQL proxy
-* http://status.vega.community - reporting on the health of the data nodes
+* https://api.vega.community - REST API proxy
+* https://grpc.vega.community - gRPC proxy
+* https://graphql.vega.community - GraphQL proxy
+* https://status.vega.community - reporting on the health of the data nodes
