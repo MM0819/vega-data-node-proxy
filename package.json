@@ -1,0 +1,27 @@
+{
+  "name": "vega-data-node-proxy",
+  "version": "1.0.0",
+  "description": "A proxy server that routes traffic to healthy data nodes on the Vega Mainnet",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MM0819/vega-data-node-proxy.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MM0819/vega-data-node-proxy/issues"
+  },
+  "homepage": "https://github.com/MM0819/vega-data-node-proxy#readme",
+  "dependencies": {
+    "@grpc/grpc-js": "^1.4.4",
+    "@grpc/proto-loader": "^0.6.6",
+    "express": "^4.17.1",
+    "node-schedule": "^2.0.0",
+    "request": "^2.88.2",
+    "request-promise": "^4.2.6"
+  }
+}

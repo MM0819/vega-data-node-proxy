@@ -1,0 +1,87 @@
+syntax = "proto3";
+
+package datanode.api.v1;
+
+service TradingDataService {
+
+  // List all known network nodes
+  rpc GetNodes(GetNodesRequest) returns (GetNodesResponse);
+
+}
+
+// Response with all nodes
+message GetNodesResponse {
+  repeated Node nodes = 1;
+}
+
+// Request to list all nodes
+message GetNodesRequest {}
+
+message EpochData {
+  // Total number of epochs since node was created
+  int32 total = 1;
+  // Total number of offline epochs since node was created
+  int32 offline = 2;
+  // Total number of online epochs since node was created
+  int32 online = 3;
+}
+
+// Node status type
+enum NodeStatus {
+  NODE_STATUS_UNSPECIFIED = 0;
+  // The node is validating
+  NODE_STATUS_VALIDATOR = 1;
+  // The node is non-validating
+  NODE_STATUS_NON_VALIDATOR = 2;
+}
+
+message Node {
+  // The node ID (wallet ID)
+  string id = 1;
+  // Pub key of the node operator
+  string pub_key = 2 [(validator.field) = {string_not_empty : true}];
+  // Public key of Tendermint
+  string tm_pub_key = 3;
+  // Ethereum public key of the node
+  string ethereum_adddress = 4;
+  // URL where I can find out more info on the node
+  string info_url = 5;
+  // Country code for the location of the node
+  string location = 6;
+  // The amount the node has put up themselves
+  string staked_by_operator = 7;
+  // The amount of stake that has been delegated by token holders
+  string staked_by_delegates = 8;
+  // Total amount staked on node
+  string staked_total = 9;
+  // Max amount of (wanted) stake, is this a network param or a node param
+  string max_intended_stake = 10;
+  // Amount of stake on the next epoch
+  string pending_stake = 11;
+  // Informantion about epoch
+  EpochData epoch_data = 12 [(validator.field) = {msg_exists : true}];
+  // Node status
+  NodeStatus status = 13 [(validator.field) = {msg_exists : true}];
+  // Node's delegations
+  repeated Delegation delegations = 14;
+  // Node score
+  string score = 15;
+  // Node normalised score
+  string normalised_score = 16;
+  // Node name
+  string name = 17;
+  // Avatar url
+  string avatar_url = 18;
+}
+
+message Delegation {
+  // Party which is delegating
+  string party = 1;
+  // Node ID
+  string node_id = 2;
+  // Amount delegated
+  string amount = 3;
+  // Epoch of delegation
+  string epoch_seq = 4;
+}
+
