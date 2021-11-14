@@ -13,3 +13,12 @@ Starting the app will expose services on four ports:
 * http://localhost:3004 - API endpoint exposing information about the health of the data nodes on the network
 
 The service currently contains hard-coded URLs for known data nodes that are running on the Vega Mainnet. There is a CRON job that runs once every minute and queries the services on each node to ensure they are returning the correct response. If a node is returning an unexpected response, or if it times out, then requests will not be routed to it via the proxy server.
+
+## Mainnet
+
+The following services are available via the `vega.community` domain, which is an unofficial domain used to host services and tools related to the Vega network:
+
+* http://api.vega.community - REST API proxy
+* http://grpc.vega.community - gRPC proxy
+* http://graphql.vega.community - GraphQL proxy
+* http://status.vega.community - reporting on the health of the data nodes
