@@ -52,9 +52,9 @@ const graphql_hosts = [
 ];
 
 const grpc_hosts = [
-  { url: 'vega-data-grpc.chorus.one:443', healthy: false },
-  { url: 'commodum.mainnet.vega.community:3007', healthy: false },
-  { url: 'lovali.mainnet.vega.community:3007', healthy: false },
+  { url: 'https://vega-data-grpc.chorus.one:443', healthy: false },
+  { url: 'http://commodum.mainnet.vega.community:3007', healthy: false },
+  { url: 'http://lovali.mainnet.vega.community:3007', healthy: false },
   { url: 'grpc.vega.xprv.io:443', healthy: false },
   { url: 'nala.mainnet.vega.community:3007', healthy: false },
   { url: 'b-harvest.mainnet.vega.community:3007', healthy: false },
@@ -161,10 +161,9 @@ schedule.scheduleJob('* * * * *', async () => {
 });
 
 const graphql = express().all('*', (req, res) => handler(req, res, graphql_hosts.filter(h => h.healthy)));
-const grpc = express().all('*', (req, res) => handler(req, res, grpc_hosts.filter(h => h.healthy)));
 const api = express().all('*', (req, res) => handler(req, res, api_hosts.filter(h => h.healthy)));
 
-const monitoring = express().get('/status', (req, res) => {
+const monitoring = express().get('/', (req, res) => {
   res.json({
     config,
     unhealthy_hosts: {
@@ -182,6 +181,5 @@ const monitoring = express().get('/status', (req, res) => {
 
 api.listen(3000);
 graphql.listen(3001);
-grpc.listen(3003);
 monitoring.listen(3004);
 
