@@ -197,9 +197,14 @@ schedule.scheduleJob('* * * * *', async () => {
 const graphql = express().all('*', (req, res) => handler(req, res, graphql_hosts.filter(h => h.healthy)));
 const api = express().all('*', (req, res) => handler(req, res, api_hosts.filter(h => h.healthy)));
 
-const monitoring = express().get('/', (req, res) => {
+const monitoring = express().get('/', async (req, res) => {
+  const result = await rp({ url: 'https://api.vega.community/statistics', timeout: config.timeout });
+  const json = JSON.parse(result);
+  const statistics = json.statistics;
+  const genesis = JSON.parse(await rp({ url: genesis_url }));
   res.json({
     config,
+    statistics,
     signing_validators: validators.filter(v => v.signing).map(v => v.name),
     offline_validators: validators.filter(v => !v.signing).map(v => v.name),
     unhealthy_data_nodes: {
@@ -211,7 +216,8 @@ const monitoring = express().get('/', (req, res) => {
       grpc: grpc_hosts.filter(h => h.healthy).map(h => h.url),
       api: api_hosts.filter(h => h.healthy).map(h => h.url),
       graphql: graphql_hosts.filter(h => h.healthy).map(h => h.url)
-    }
+    },
+    genesis
   });
 });
 
