@@ -6,6 +6,7 @@ const schedule = require('node-schedule');
 const grpcJS = require("@grpc/grpc-js");
 const protoLoader = require("@grpc/proto-loader");
 const util = require('util');
+const cors = require('cors');
 
 const options = {
   keepCase: true,
@@ -14,6 +15,14 @@ const options = {
   defaults: true,
   oneofs: true
 };
+
+const api_app = express();
+const graphql_app = express();
+const monitoring_app = express();
+
+api_app.use(cors({ origin: '*' }));
+graphql_app.use(cors({ origin: '*' }));
+monitoring_app.use(cors({ origin: '*' }));
 
 const PROTO_PATH = './nodes.proto';
 const packageDefinition = protoLoader.loadSync(PROTO_PATH, options);
@@ -194,10 +203,10 @@ schedule.scheduleJob('* * * * *', async () => {
   await update_validators_health();
 });
 
-const graphql = express().all('*', (req, res) => handler(req, res, graphql_hosts.filter(h => h.healthy)));
-const api = express().all('*', (req, res) => handler(req, res, api_hosts.filter(h => h.healthy)));
+const graphql = graphql_app.all('*', (req, res) => handler(req, res, graphql_hosts.filter(h => h.healthy)));
+const api = api_app.all('*', (req, res) => handler(req, res, api_hosts.filter(h => h.healthy)));
 
-const monitoring = express().get('/', async (req, res) => {
+const monitoring = monitoring_app.get('/', async (req, res) => {
   res.json({
     config,
     signing_validators: validators.filter(v => v.signing).map(v => v.name),
@@ -215,7 +224,7 @@ const monitoring = express().get('/', async (req, res) => {
   });
 });
 
-api.listen(3000);
-graphql.listen(3001);
-monitoring.listen(3004);
+api_app.listen(3000);
+graphql_app.listen(3001);
+monitoring_app.listen(3004);
 

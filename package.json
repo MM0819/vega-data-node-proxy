@@ -19,6 +19,7 @@
   "dependencies": {
     "@grpc/grpc-js": "^1.4.4",
     "@grpc/proto-loader": "^0.6.6",
+    "cors": "^2.8.5",
     "express": "^4.17.1",
     "node-schedule": "^2.0.0",
     "request": "^2.88.2",
