@@ -169,18 +169,8 @@ const update_grpc_hosts_health = async () => {
 };
 
 const update_validators_health = async () => {
-  let result = await rp({ url: genesis_url });
-  let json = JSON.parse(result);
-  for(let i=0; i<json.result.genesis.validators.length; i++) {
-    const validator = json.result.genesis.validators[i];
-    const check_validator = validators.filter(v => v.name === validator.name);
-    const validator_name = json.result.genesis.app_state.validators[validator.pub_key.value].name;
-    if(check_validator.length === 0) {
-      validators.push({ name: validator_name, address: validator.address, signing: false });
-    }
-  }
-  result = await rp({ url: block_url });
-  json = JSON.parse(result);
+  const result = await rp({ url: block_url });
+  const json = JSON.parse(result);
   for(let i=0; i<json.result.block.last_commit.signatures.length; i++) {
     const signature = json.result.block.last_commit.signatures[i];
     let signing = false;
@@ -195,6 +185,18 @@ const update_validators_health = async () => {
     }
   }
 };
+
+const init_validators = async () => {
+  const result = await rp({ url: genesis_url });
+  const json = JSON.parse(result);
+  for(let i=0; i<json.result.genesis.validators.length; i++) {
+    const validator = json.result.genesis.validators[i];
+    const validator_name = json.result.genesis.app_state.validators[validator.pub_key.value].name;
+    validators.push({ name: validator_name, address: validator.address, signing: false });
+  }
+};
+
+init_validators();
 
 schedule.scheduleJob('* * * * *', async () => {
   await update_api_hosts_health();
