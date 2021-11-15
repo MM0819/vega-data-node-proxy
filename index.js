@@ -67,6 +67,11 @@ const grpc_hosts = [
   { url: 'ryabina.mainnet.vega.community:3007', healthy: false }
 ];
 
+const validators = [];
+
+const block_url = 'http://dn1.vega.community:26657/block';
+const genesis_url = 'http://dn1.vega.community:26657/genesis';
+
 const config = {
   expected_app_version: 'v0.45.4',
   graphql_query: '{ \n nodes { \n id \n } \n }',
@@ -154,10 +159,39 @@ const update_grpc_hosts_health = async () => {
   }
 };
 
+const update_validators_health = async () => {
+  let result = await rp({ url: genesis_url });
+  let json = JSON.parse(result);
+  for(let i=0; i<json.result.genesis.validators.length; i++) {
+    const validator = json.result.genesis.validators[i];
+    const check_validator = validators.filter(v => v.name === validator.name);
+    const validator_name = json.result.genesis.app_state.validators[validator.pub_key.value].name;
+    if(check_validator.length === 0) {
+      validators.push({ name: validator_name, address: validator.address, signing: false });
+    }
+  }
+  result = await rp({ url: block_url });
+  json = JSON.parse(result);
+  for(let i=0; i<json.result.block.last_commit.signatures.length; i++) {
+    const signature = json.result.block.last_commit.signatures[i];
+    let signing = false;
+    for(let j=0; j<validators.length; j++) {
+      if(signature.validator_address === validators[j].address) {
+        validators[j].signing = true;
+	signing = true;
+      }
+    }
+    if(!signing) {
+      validators[j].signing = false;
+    }
+  }
+};
+
 schedule.scheduleJob('* * * * *', async () => {
   await update_api_hosts_health();
   await update_graphql_hosts_health();
   await update_grpc_hosts_health();
+  await update_validators_health();
 });
 
 const graphql = express().all('*', (req, res) => handler(req, res, graphql_hosts.filter(h => h.healthy)));
@@ -166,12 +200,14 @@ const api = express().all('*', (req, res) => handler(req, res, api_hosts.filter(
 const monitoring = express().get('/', (req, res) => {
   res.json({
     config,
-    unhealthy_hosts: {
+    signing_validators: validators.filter(v => v.signing).map(v => v.name),
+    offline_validators: validators.filter(v => !v.signing).map(v => v.name),
+    unhealthy_data_nodes: {
       grpc: grpc_hosts.filter(h => !h.healthy).map(h => h.url),
       api: api_hosts.filter(h => !h.healthy).map(h => h.url),
       graphql: graphql_hosts.filter(h => !h.healthy).map(h => h.url)
     },
-    healthy_hosts: {
+    healthy_data_nodes: {
       grpc: grpc_hosts.filter(h => h.healthy).map(h => h.url),
       api: api_hosts.filter(h => h.healthy).map(h => h.url),
       graphql: graphql_hosts.filter(h => h.healthy).map(h => h.url)
