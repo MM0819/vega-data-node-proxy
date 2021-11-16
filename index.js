@@ -88,18 +88,22 @@ const config = {
   expected_node_count: 13
 };
 
-let cur = 0;
+const randomInt = (min, max) => {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min) + min);
+};
 
 const handler = (req, res, hosts) => {
+  const idx = randomInt(0, hosts.length-1);
   if(hosts.length === 0) {
     res.status(500).json({error: 'Service unavailable'});
     return;
   }
-  const _req = request({ url: hosts[cur].url + req.url, timeout: config.timeout }).on('error', error => {
+  const _req = request({ url: hosts[idx].url + req.url, timeout: config.timeout }).on('error', error => {
     res.status(500).json({error: error.message});
   });
   req.pipe(_req).pipe(res);
-  cur = (cur + 1) % hosts.length;
 };
 
 const update_api_hosts_health = async () => {
